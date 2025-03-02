@@ -1,0 +1,17 @@
+# 必要なパッケージを読み込む
+library(tidyverse)
+
+# HTSeqの出力ファイルを取得
+files <- list.files(pattern = "_counts.txt$")
+
+# 各ファイルを読み込み、データフレームに変換
+count_list <- lapply(files, function(f) {
+  df <- read.delim(f, header = FALSE, col.names = c("Gene", f))
+  df
+})
+
+# すべてのデータをマージ（最初のカラム "Gene" で統合）
+count_data <- reduce(count_list, full_join, by = "Gene")
+
+# 整形して保存
+write.table(count_data, "merged_counts.tsv", sep = "\t", quote = FALSE, row.names = FALSE)
