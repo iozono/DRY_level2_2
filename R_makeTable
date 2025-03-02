@@ -1,0 +1,25 @@
+# 必要なパッケージ
+library(DESeq2)
+
+# カウントデータを読み込み
+count_data <- read.delim("merged_counts.tsv", row.names = 1, check.names = FALSE)
+
+# 実験デザイン（サンプル条件を指定）
+coldata <- data.frame(
+  sample = colnames(count_data),
+  condition = c("control", "treatment", "control", "treatment", "control", "treatment")  # 変更が必要
+)
+rownames(coldata) <- coldata$sample
+
+# DESeq2オブジェクトを作成
+dds <- DESeqDataSetFromMatrix(countData = count_data, colData = coldata, design = ~ condition)
+
+# 解析の実行
+dds <- DESeq(dds)
+
+# 結果を取得
+res <- results(dds)
+res <- res[order(res$pvalue), ]
+
+# 結果を保存
+write.csv(as.data.frame(res), "DESeq2_results.csv")
